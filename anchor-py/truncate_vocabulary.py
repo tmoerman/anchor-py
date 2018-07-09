@@ -4,7 +4,7 @@ import scipy.io
 import sys
 
 if len(sys.argv) < 3:
-    print "usage: input_matrix vocab_file cutoff"
+    print("usage: input_matrix vocab_file cutoff")
     sys.exit()
 
 input_matrix = sys.argv[1]
@@ -16,18 +16,16 @@ output_vocab = sys.argv[2]+".trunc"
 # cutoff for the number of distinct documents that each word appears in
 cutoff = int(sys.argv[3])
 
-
-
 # Read in the vocabulary and build a symbol table mapping words to indices
 table = dict()
-numwords = 0
+n_words = 0
 with open(full_vocab, 'r') as file:
     for line in file:
-        table[line.rstrip()] = numwords
-        numwords += 1
+        table[line.rstrip()] = n_words
+        n_words += 1
 
 
-remove_word = [False]*numwords
+remove_word = [False] * n_words
 
 # Read in the stopwords
 with open('stopwords.txt', 'r') as file:
@@ -40,12 +38,12 @@ with open('stopwords.txt', 'r') as file:
 S = scipy.io.loadmat(input_matrix)
 M = S['M']
 
-if M.shape[0] != numwords:
-    print 'Error: vocabulary file has different number of words', M.shape, numwords
+if M.shape[0] != n_words:
+    print('Error: vocabulary file has different number of words', M.shape, n_words)
     sys.exit()
-print 'Number of words is ', numwords
-print 'Number of documents is ', M.shape[1]
 
+print('Number of words is ', n_words)
+print('Number of documents is ', M.shape[1])
 
 M = M.tocsr()
 
@@ -56,7 +54,7 @@ new_data = np.zeros(M.data.shape[0], dtype=np.float64)
 indptr_counter = 1
 data_counter = 0
 
-for i in xrange(M.indptr.size - 1):
+for i in range(M.indptr.size - 1):
 
     # if this is not a stopword
     if not remove_word[i]:
@@ -82,8 +80,8 @@ M = scipy.sparse.csr_matrix((new_data, new_indices, new_indptr))
 M = M.tocsc()
 scipy.io.savemat(output_matrix, {'M' : M}, oned_as='column')
 
-print 'New number of words is ', M.shape[0]
-print 'New number of documents is ', M.shape[1]
+print('New number of words is ', M.shape[0])
+print('New number of documents is ', M.shape[1])
 
 # Output the new vocabulary
 output = open(output_vocab, 'w')
